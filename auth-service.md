@@ -26,7 +26,7 @@ Base router:
 
 - Direct service path: `/api/v1/auth`
 - Development docs path: `/api/v1/auth/docs`
-- Current Kubernetes gateway path: `/api/auth`
+- Current Kubernetes gateway path: `/api/v1/auth`
 
 ### Endpoints
 
@@ -155,11 +155,35 @@ Required ConfigMap keys:
 
 - None
 
+## Dockerfile
+
+The Auth Service uses a multi-stage Python Docker build.
+
+Build stages:
+
+- `builder`: starts from `dhi.io/python:3.13-dev`
+- Creates a virtual environment at `/app/venv`
+- Copies `requirements.txt`
+- Installs Python dependencies into the virtual environment
+- Uses a pip cache mount to speed up repeated builds
+- Final stage starts from `dhi.io/python:3.13.13`
+- Copies the prepared virtual environment from the builder stage
+- Copies the `app/` source directory into the image
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `PATH` includes `/app/venv/bin`
+- `PYTHONUNBUFFERED=1` is enabled
+- Runs as non-root user `10001`
+- Exposes port `3000`
+- Starts the service with `uvicorn app.main:app --host 0.0.0.0 --port 3000`
+
 ## Operational notes
 
 - API docs are disabled when `ENVIRONMENT=production`.
+- All Auth Service endpoints use the `/api/v1` prefix.
 - Request ID middleware propagates `X-Request-ID` on responses.
-- The auth service is the only place where the RBAC catalog is seeded in the current workspace.
 - A `notification_tasks.py` stub exists locally so task names are registered, but the actual email work happens in `sales-notification-service/`.
 
 ## GitOps workflow

@@ -24,21 +24,19 @@ The payment service records payments against invoices, calculates whether an inv
 
 Base router:
 
-- Direct service path: `/payments`
-- Development docs path: `/payments/docs`
+- Direct service path: `/api/v1/payments`
+- Development docs path: `/api/v1/payments/docs`
 - Frontend API client currently calls payment APIs through `/api/v1/payments/...`
-- Current Kubernetes gateway path in `k8s/httproutes/payment-route.yaml`: `/api/payment`
-
-The route-prefix mismatch above is important to keep in mind when using or publishing these docs.
+- Current Kubernetes gateway path in `k8s/httproutes/payment-route.yaml`: `/api/v1/payments`
 
 ### Endpoints
 
 | Method | Path | Purpose | Auth | Permission |
 | --- | --- | --- | --- | --- |
-| GET | `/payments/health` | Health check | No | None |
-| POST | `/payments/pay` | Record a payment | Yes | `payment.create` |
-| GET | `/payments/invoice/{invoice_id}` | List payments for an invoice | Yes | `payment.read` |
-| POST | `/payments/refund/{invoice_id}` | Mark invoice as refunded | Yes | `payment.refund` |
+| GET | `/api/v1/payments/health` | Health check | No | None |
+| POST | `/api/v1/payments/pay` | Record a payment | Yes | `payment.create` |
+| GET | `/api/v1/payments/invoice/{invoice_id}` | List payments for an invoice | Yes | `payment.read` |
+| POST | `/api/v1/payments/refund/{invoice_id}` | Mark invoice as refunded | Yes | `payment.refund` |
 
 ### Request and response models
 
@@ -104,9 +102,9 @@ Refund response returned by service logic:
 - Invoice service:
 - Environment variable: `INVOICE_SERVICE_URL`
 - Reads:
-- `GET {INVOICE_SERVICE_URL}/invoices/{invoice_id}`
+- `GET {INVOICE_SERVICE_URL}/api/v1/invoices/{invoice_id}`
 - Writes:
-- `POST {INVOICE_SERVICE_URL}/invoices/{invoice_id}/status`
+- `POST {INVOICE_SERVICE_URL}/api/v1/invoices/{invoice_id}/status`
 - Forwarded header:
 - `Authorization`
 
@@ -134,9 +132,34 @@ Required ConfigMap keys:
 
 - `INVOICE_SERVICE_URL`
 
+## Dockerfile
+
+The Payment Service uses a multi-stage Python Docker build.
+
+Build stages:
+
+- `builder`: starts from `dhi.io/python:3.13-dev`
+- Creates a virtual environment at `/app/venv`
+- Copies `requirements.txt`
+- Installs Python dependencies into the virtual environment
+- Uses a pip cache mount to speed up repeated builds
+- Final stage starts from `dhi.io/python:3.13.13`
+- Copies the prepared virtual environment from the builder stage
+- Copies the `app/` source directory into the image
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `PATH` includes `/app/venv/bin`
+- `PYTHONUNBUFFERED=1` is enabled
+- Runs as non-root user `10001`
+- Exposes port `3000`
+- Starts the service with `uvicorn app.main:app --host 0.0.0.0 --port 3000`
+
 ## Operational notes
 
 - API docs are disabled in production.
+- All Payment Service endpoints use the `/api/v1` prefix.
 - The refund endpoint changes invoice status but does not create a negative payment entry in the payments table.
 - No request ID middleware is currently configured here.
 

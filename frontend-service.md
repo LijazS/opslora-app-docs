@@ -96,29 +96,29 @@ Shared API prefix in code:
 Routes used by the UI:
 
 - Auth:
-- `POST /auth/signup`
-- `POST /auth/login`
+- `POST /api/v1/auth/signup`
+- `POST /api/v1/auth/login`
 - Customers:
-- `GET /customers`
-- `POST /customers/create-customer`
-- `GET /customers/{id}`
-- `PUT /customers/{id}`
+- `GET /api/v1/customers`
+- `POST /api/v1/customers/create-customer`
+- `GET /api/v1/customers/{id}`
+- `PUT /api/v1/customers/{id}`
 - Orders:
-- `GET /orders`
-- `GET /orders/{id}`
-- `POST /orders/create-order/`
-- `PUT /orders/{id}`
-- `POST /orders/{id}/confirm`
-- `POST /orders/{id}/cancel`
+- `GET /api/v1/orders`
+- `GET /api/v1/orders/{id}`
+- `POST /api/v1/orders/create-order/`
+- `PUT /api/v1/orders/{id}`
+- `POST /api/v1/orders/{id}/confirm`
+- `POST /api/v1/orders/{id}/cancel`
 - Invoices:
-- `GET /invoices`
-- `GET /invoices/{id}`
-- `POST /invoices/orders/{id}`
-- `POST /invoices/{id}/cancel`
+- `GET /api/v1/invoices`
+- `GET /api/v1/invoices/{id}`
+- `POST /api/v1/invoices/orders/{id}`
+- `POST /api/v1/invoices/{id}/cancel`
 - Payments:
-- `GET /payments/invoice/{id}`
-- `POST /payments/pay`
-- `POST /payments/refund/{id}`
+- `GET /api/v1/payments/invoice/{id}`
+- `POST /api/v1/payments/pay`
+- `POST /api/v1/payments/refund/{id}`
 
 ## Communication with other services
 
@@ -140,6 +140,31 @@ Required ConfigMap keys:
 
 - None
 
+## Dockerfile
+
+The Frontend Service uses a multi-stage Node.js Docker build.
+
+Build stages:
+
+- `builder`: starts from `node:20-alpine`
+- Copies `package*.json`
+- Runs `npm ci`
+- Copies the full application source
+- Builds the production Next.js output with `npm run build`
+- `deps`: starts from `node:20-alpine`
+- Installs production-only dependencies with `npm ci --omit=dev`
+- Final stage starts from `dhi.io/node:20-debian13`
+- Copies production `node_modules` from the `deps` stage
+- Copies `.next`, `public`, `package.json`, and `next.config.*` from the `builder` stage
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `NODE_ENV=production`
+- Runs as the non-root `node` user
+- Exposes port `3000`
+- Starts the app with `node node_modules/next/dist/bin/next start`
+
 ## Roles and permissions
 
 - The frontend only checks whether a token exists.
@@ -148,7 +173,7 @@ Required ConfigMap keys:
 
 ## Current integration note
 
-The frontend API client uses `/api/v1` for every request, but the current backend route shapes and Kubernetes `HTTPRoute` manifests are not completely consistent, especially for invoice and payment traffic. If you publish these docs for operators, include a routing verification step.
+The frontend API client uses `/api/v1` for every backend request.
 
 ## GitOps workflow
 

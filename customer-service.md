@@ -26,8 +26,8 @@ The customer service owns customer master data for each organization. It exposes
 Base router:
 
 - Direct service path: `/api/v1/customers`
-- Development docs path: `/customers/docs`
-- Current Kubernetes gateway path: `/api/customers`
+- Development docs path: `/api/v1/customers/docs`
+- Current Kubernetes gateway path: `/api/v1/customers`
 
 ### Endpoints
 
@@ -117,9 +117,34 @@ Required ConfigMap keys:
 
 - None
 
+## Dockerfile
+
+The Customer Service uses a multi-stage Python Docker build.
+
+Build stages:
+
+- `builder`: starts from `dhi.io/python:3.13-dev`
+- Creates a virtual environment at `/app/venv`
+- Copies `requirements.txt`
+- Installs Python dependencies into the virtual environment
+- Uses a pip cache mount to speed up repeated builds
+- Final stage starts from `dhi.io/python:3.13.13`
+- Copies the prepared virtual environment from the builder stage
+- Copies the `app/` source directory into the image
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `PATH` includes `/app/venv/bin`
+- `PYTHONUNBUFFERED=1` is enabled
+- Runs as non-root user `10001`
+- Exposes port `3000`
+- Starts the service with `uvicorn app.main:app --host 0.0.0.0 --port 3000`
+
 ## Operational notes
 
 - API docs are disabled in production.
+- All Customer Service endpoints use the `/api/v1` prefix.
 - `redirect_slashes=False` is enabled, so trailing slash behavior matters.
 - The frontend currently calls the listing endpoint with a trailing slash, which matches the current route shape.
 - Request ID middleware adds `X-Request-ID` to responses.

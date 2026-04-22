@@ -25,7 +25,7 @@ The notification service is the platform's asynchronous email worker. It consume
 
 | Method | Path | Purpose | Auth | Permission |
 | --- | --- | --- | --- | --- |
-| GET | `/api/notification/health` | Health check | No | None |
+| GET | `/api/v1/notification/health` | Health check | No | None |
 
 ### Celery task surface
 
@@ -74,6 +74,30 @@ Required ConfigMap keys:
 
 - None
 
+## Dockerfile
+
+The Notification Service uses a multi-stage Python Docker build.
+
+Build stages:
+
+- `builder`: starts from `dhi.io/python:3.13-dev`
+- Creates a virtual environment at `/app/venv`
+- Copies `requirements.txt`
+- Installs Python dependencies into the virtual environment
+- Uses a pip cache mount to speed up repeated builds
+- Final stage starts from `dhi.io/python:3.13.13`
+- Copies the prepared virtual environment from the builder stage
+- Copies the `app/` source directory into the image
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `PATH` includes `/app/venv/bin`
+- `PYTHONUNBUFFERED=1` is enabled
+- Runs as non-root user `10001`
+- Exposes port `3000`
+- Starts the service with `uvicorn app.main:app --host 0.0.0.0 --port 3000`
+
 ## Message payloads
 
 ### Signup email payload
@@ -98,6 +122,7 @@ Required ConfigMap keys:
 - Concurrency is set to `2` in `entrypoint.sh`.
 - Each task retries up to `5` times on exception.
 - FastAPI is present only for health checking; the main workload is the Celery worker process.
+- The HTTP health endpoint uses the `/api/v1` prefix.
 
 ## Roles and permissions
 

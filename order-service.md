@@ -28,8 +28,8 @@ The order service manages sales orders and line items for each organization. It 
 Base router:
 
 - Direct service path: `/api/v1/orders`
-- Development docs path: `/orders/docs`
-- Current Kubernetes gateway path: `/api/orders`
+- Development docs path: `/api/v1/orders/docs`
+- Current Kubernetes gateway path: `/api/v1/orders`
 
 ### Endpoints
 
@@ -160,9 +160,34 @@ Required ConfigMap keys:
 
 - `CUSTOMER_SERVICE_URL`
 
+## Dockerfile
+
+The Order Service uses a multi-stage Python Docker build.
+
+Build stages:
+
+- `builder`: starts from `dhi.io/python:3.13-dev`
+- Creates a virtual environment at `/app/venv`
+- Copies `requirements.txt`
+- Installs Python dependencies into the virtual environment
+- Uses a pip cache mount to speed up repeated builds
+- Final stage starts from `dhi.io/python:3.13.13`
+- Copies the prepared virtual environment from the builder stage
+- Copies the `app/` source directory into the image
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `PATH` includes `/app/venv/bin`
+- `PYTHONUNBUFFERED=1` is enabled
+- Runs as non-root user `10001`
+- Exposes port `3000`
+- Starts the service with `uvicorn app.main:app --host 0.0.0.0 --port 3000`
+
 ## Operational notes
 
 - API docs are disabled in production.
+- All Order Service endpoints use the `/api/v1` prefix.
 - The service computes order totals dynamically when reading data; totals are not persisted as a dedicated column.
 - `API_VERSION` defaults to `/api/v1`.
 - The order service stores customer name and email as a snapshot at order creation time.

@@ -26,24 +26,24 @@ The invoice service creates one invoice per confirmed order, computes tax and di
 
 Base router:
 
-- Direct service path: `/invoices`
-- Development docs path: `/invoices/docs`
-- Current Kubernetes gateway path: `/api/invoices`
+- Direct service path: `/api/v1/invoices`
+- Development docs path: `/api/v1/invoices/docs`
+- Current Kubernetes gateway path: `/api/v1/invoices`
 
 ### Endpoints
 
 | Method | Path | Purpose | Auth | Permission |
 | --- | --- | --- | --- | --- |
-| GET | `/invoices/health` | Health check | No | None |
-| POST | `/invoices/orders/{order_id}` | Create invoice from order | Yes | `invoice.create` |
-| GET | `/invoices/{invoice_id}` | Fetch one invoice | Yes | `invoice.read` |
-| GET | `/invoices/` | List invoices | Yes | `invoice.read` |
-| POST | `/invoices/{invoice_id}/cancel` | Cancel invoice | Yes | `invoice.cancel` |
-| POST | `/invoices/{invoice_id}/status` | Update invoice status | Yes | `invoice.update` |
+| GET | `/api/v1/invoices/health` | Health check | No | None |
+| POST | `/api/v1/invoices/orders/{order_id}` | Create invoice from order | Yes | `invoice.create` |
+| GET | `/api/v1/invoices/{invoice_id}` | Fetch one invoice | Yes | `invoice.read` |
+| GET | `/api/v1/invoices/` | List invoices | Yes | `invoice.read` |
+| POST | `/api/v1/invoices/{invoice_id}/cancel` | Cancel invoice | Yes | `invoice.cancel` |
+| POST | `/api/v1/invoices/{invoice_id}/status` | Update invoice status | Yes | `invoice.update` |
 
 ### Query parameters
 
-`GET /invoices/`
+`GET /api/v1/invoices/`
 
 - `status`: optional
 - `order_id`: optional
@@ -126,7 +126,7 @@ Status update payload:
 
 - Order service:
 - Environment variable: `ORDER_SERVICE_URL`
-- Request used: `GET {ORDER_SERVICE_URL}/orders/{order_id}`
+- Request used: `GET {ORDER_SERVICE_URL}/api/v1/orders/{order_id}`
 - Forwarded headers:
 - `Authorization`
 - Purpose:
@@ -159,10 +159,34 @@ Required ConfigMap keys:
 
 - `ORDER_SERVICE_URL`
 
+## Dockerfile
+
+The Invoice Service uses a multi-stage Python Docker build.
+
+Build stages:
+
+- `builder`: starts from `dhi.io/python:3.13-dev`
+- Creates a virtual environment at `/app/venv`
+- Copies `requirements.txt`
+- Installs Python dependencies into the virtual environment
+- Uses a pip cache mount to speed up repeated builds
+- Final stage starts from `dhi.io/python:3.13.13`
+- Copies the prepared virtual environment from the builder stage
+- Copies the `app/` source directory into the image
+
+Runtime configuration:
+
+- Working directory: `/app`
+- `PATH` includes `/app/venv/bin`
+- `PYTHONUNBUFFERED=1` is enabled
+- Runs as non-root user `10001`
+- Exposes port `3000`
+- Starts the service with `uvicorn app.main:app --host 0.0.0.0 --port 3000`
+
 ## Operational notes
 
 - API docs are disabled in production.
-- The service mounts routes without `/api/v1`, so published routes need to be aligned carefully with whichever ingress or gateway layer is used.
+- All Invoice Service endpoints use the `/api/v1` prefix.
 - No request ID middleware is currently configured here.
 - Overdue status exists in the enum and database constraint, but no background job currently auto-transitions invoices to `OVERDUE`.
 
