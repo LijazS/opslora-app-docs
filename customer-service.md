@@ -49,17 +49,14 @@ Base router:
 
 ### Request and response models
 
-Create and update payloads:
-
-- `name`
-- `email`
-
-Customer response:
-
-- `id`
-- `name`
-- `email`
-- `created_at`
+- Create and update payloads:
+  - `name`
+  - `email`
+- Customer response:
+  - `id`
+  - `name`
+  - `email`
+  - `created_at`
 
 ## Data model
 
@@ -103,19 +100,12 @@ Customer response:
 
 ## Deployment config and secrets
 
-Secret name:
-
-- `customer-secret`
-
-Required secret keys:
-
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `ENVIRONMENT`
-
-Required ConfigMap keys:
-
-- None
+- Secret name: `customer-secret`
+- Required secret keys:
+  - `DATABASE_URL`
+  - `JWT_SECRET_KEY`
+  - `ENVIRONMENT`
+- Required ConfigMap keys: None
 
 ## Dockerfile
 
@@ -132,14 +122,16 @@ Security approach:
 
 Build stages:
 
-- `builder`: starts from `dhi.io/python:3.13-dev`
-- Creates a virtual environment at `/app/venv`
-- Copies `requirements.txt`
-- Installs Python dependencies into the virtual environment
-- Uses a pip cache mount to speed up repeated builds
-- Final stage starts from `dhi.io/python:3.13.13`
-- Copies the prepared virtual environment from the builder stage
-- Copies the `app/` source directory into the image
+- Builder stage:
+  - Starts from `dhi.io/python:3.13-dev`
+  - Creates a virtual environment at `/app/venv`
+  - Copies `requirements.txt`
+  - Installs Python dependencies into the virtual environment
+  - Uses a pip cache mount to speed up repeated builds
+- Runtime stage:
+  - Starts from `dhi.io/python:3.13.13`
+  - Copies the prepared virtual environment from the builder stage
+  - Copies the `app/` source directory into the image
 
 Runtime configuration:
 

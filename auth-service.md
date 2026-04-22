@@ -41,26 +41,26 @@ Base router:
 `POST /api/v1/auth/signup`
 
 - Request fields:
-- `organization_name`: 2-150 chars
-- `organization_slug`: 2-100 chars, lowercase letters, digits, hyphen
-- `email`: valid email
-- `password`: minimum 8 chars
+  - `organization_name`: 2-150 chars
+  - `organization_slug`: 2-100 chars, lowercase letters, digits, hyphen
+  - `email`: valid email
+  - `password`: minimum 8 chars
 - Response fields:
-- `access_token`
-- `token_type`
-- `user_id`
-- `email`
-- `organization_name`
+  - `access_token`
+  - `token_type`
+  - `user_id`
+  - `email`
+  - `organization_name`
 
 `POST /api/v1/auth/login`
 
 - Request fields:
-- `organization_slug`
-- `email`
-- `password`
+  - `organization_slug`
+  - `email`
+  - `password`
 - Response fields:
-- `access_token`
-- `token_type`
+  - `access_token`
+  - `token_type`
 
 ## Data model
 
@@ -114,10 +114,10 @@ Base router:
 
 ### Outbound
 
-- Notification service:
-- Transport: RabbitMQ via Celery
-- Task name: `notification.send_signup_email`
-- Payload includes `user_id`, `email`, and `organization_name`
+- Notification service
+  - Transport: RabbitMQ via Celery
+  - Task name: `notification.send_signup_email`
+  - Payload includes `user_id`, `email`, and `organization_name`
 
 ### Inbound dependencies
 
@@ -131,29 +131,22 @@ Base router:
 - Secret source: `JWT_SECRET_KEY`
 - Expiry source: `ACCESS_TOKEN_EXPIRE_MINUTES`
 - Token claims created by the service:
-- `user_id`
-- `email`
-- `org_id`
-- `permissions`
-- `exp`
+  - `user_id`
+  - `email`
+  - `org_id`
+  - `permissions`
+  - `exp`
 
 ## Deployment config and secrets
 
-Secret name:
-
-- `auth-secret`
-
-Required secret keys:
-
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `ENVIRONMENT`
-- `ACCESS_TOKEN_EXPIRE_MINUTES`
-- `RABBITMQ_URL`
-
-Required ConfigMap keys:
-
-- None
+- Secret name: `auth-secret`
+- Required secret keys:
+  - `DATABASE_URL`
+  - `JWT_SECRET_KEY`
+  - `ENVIRONMENT`
+  - `ACCESS_TOKEN_EXPIRE_MINUTES`
+  - `RABBITMQ_URL`
+- Required ConfigMap keys: None
 
 ## Dockerfile
 
@@ -170,14 +163,16 @@ Security approach:
 
 Build stages:
 
-- `builder`: starts from `dhi.io/python:3.13-dev`
-- Creates a virtual environment at `/app/venv`
-- Copies `requirements.txt`
-- Installs Python dependencies into the virtual environment
-- Uses a pip cache mount to speed up repeated builds
-- Final stage starts from `dhi.io/python:3.13.13`
-- Copies the prepared virtual environment from the builder stage
-- Copies the `app/` source directory into the image
+- Builder stage:
+  - Starts from `dhi.io/python:3.13-dev`
+  - Creates a virtual environment at `/app/venv`
+  - Copies `requirements.txt`
+  - Installs Python dependencies into the virtual environment
+  - Uses a pip cache mount to speed up repeated builds
+- Runtime stage:
+  - Starts from `dhi.io/python:3.13.13`
+  - Copies the prepared virtual environment from the builder stage
+  - Copies the `app/` source directory into the image
 
 Runtime configuration:
 

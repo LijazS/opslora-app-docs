@@ -50,38 +50,33 @@ Base router:
 
 ### Request and response models
 
-Create endpoint:
-
-- Path parameter: `order_id`
-- The frontend currently sends discount fields, but the current router does not bind them from the request body.
-- The service function supports:
-- `discount_type`
-- `discount_value`
-- In the current API implementation those arguments stay at their defaults unless the route is expanded.
-
-Invoice response:
-
-- `id`
-- `order_id`
-- `subtotal`
-- `tax`
-- `total`
-- `due_date`
-- `status`
-- `discount_type`
-- `discount_value`
-- `created_at`
-
-Status update payload:
-
-- `status`
-- Allowed values:
-- `UNPAID`
-- `PARTIALLY_PAID`
-- `PAID`
-- `OVERDUE`
-- `CANCELLED`
-- `REFUNDED`
+- Create endpoint:
+  - Path parameter: `order_id`
+  - The frontend currently sends discount fields, but the current router does not bind them from the request body.
+  - The service function supports:
+    - `discount_type`
+    - `discount_value`
+  - In the current API implementation those arguments stay at their defaults unless the route is expanded.
+- Invoice response:
+  - `id`
+  - `order_id`
+  - `subtotal`
+  - `tax`
+  - `total`
+  - `due_date`
+  - `status`
+  - `discount_type`
+  - `discount_value`
+  - `created_at`
+- Status update payload:
+  - `status`
+  - Allowed values:
+    - `UNPAID`
+    - `PARTIALLY_PAID`
+    - `PAID`
+    - `OVERDUE`
+    - `CANCELLED`
+    - `REFUNDED`
 
 ## Data model
 
@@ -124,15 +119,15 @@ Status update payload:
 
 ### Outbound synchronous HTTP
 
-- Order service:
-- Environment variable: `ORDER_SERVICE_URL`
-- Request used: `GET {ORDER_SERVICE_URL}/api/v1/orders/{order_id}`
-- Forwarded headers:
-- `Authorization`
-- Purpose:
-- Validate order existence
-- Check order status is `CONFIRMED`
-- Pull line items for subtotal and tax calculation
+- Order service
+  - Environment variable: `ORDER_SERVICE_URL`
+  - Request used: `GET {ORDER_SERVICE_URL}/api/v1/orders/{order_id}`
+  - Forwarded headers:
+    - `Authorization`
+  - Purpose:
+    - Validate order existence
+    - Check order status is `CONFIRMED`
+    - Pull line items for subtotal and tax calculation
 
 ### Inbound synchronous HTTP
 
@@ -141,23 +136,14 @@ Status update payload:
 
 ## Deployment config and secrets
 
-Secret name:
-
-- `invoice-secret`
-
-Required secret keys:
-
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `ENVIRONMENT`
-
-ConfigMap name:
-
-- `invoice-config`
-
-Required ConfigMap keys:
-
-- `ORDER_SERVICE_URL`
+- Secret name: `invoice-secret`
+- Required secret keys:
+  - `DATABASE_URL`
+  - `JWT_SECRET_KEY`
+  - `ENVIRONMENT`
+- ConfigMap name: `invoice-config`
+- Required ConfigMap keys:
+  - `ORDER_SERVICE_URL`
 
 ## Dockerfile
 
@@ -174,14 +160,16 @@ Security approach:
 
 Build stages:
 
-- `builder`: starts from `dhi.io/python:3.13-dev`
-- Creates a virtual environment at `/app/venv`
-- Copies `requirements.txt`
-- Installs Python dependencies into the virtual environment
-- Uses a pip cache mount to speed up repeated builds
-- Final stage starts from `dhi.io/python:3.13.13`
-- Copies the prepared virtual environment from the builder stage
-- Copies the `app/` source directory into the image
+- Builder stage:
+  - Starts from `dhi.io/python:3.13-dev`
+  - Creates a virtual environment at `/app/venv`
+  - Copies `requirements.txt`
+  - Installs Python dependencies into the virtual environment
+  - Uses a pip cache mount to speed up repeated builds
+- Runtime stage:
+  - Starts from `dhi.io/python:3.13.13`
+  - Copies the prepared virtual environment from the builder stage
+  - Copies the `app/` source directory into the image
 
 Runtime configuration:
 

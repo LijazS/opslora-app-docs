@@ -55,24 +55,19 @@ Base router:
 
 ### Request and response models
 
-Order create payload:
-
-- `customer_id`
-- `items[]`
-- Each item has `product_name`, `quantity`, `unit_price`
-
-Order update payload:
-
-- `items[]`
-
-Order response:
-
-- `id`
-- `customer_id`
-- `status`
-- `created_at`
-- `total`
-- `items[]`
+- Order create payload:
+  - `customer_id`
+  - `items[]`
+  - Each item includes `product_name`, `quantity`, `unit_price`
+- Order update payload:
+  - `items[]`
+- Order response:
+  - `id`
+  - `customer_id`
+  - `status`
+  - `created_at`
+  - `total`
+  - `items[]`
 
 ## Data model
 
@@ -115,24 +110,24 @@ Order response:
 
 ### Outbound synchronous HTTP
 
-- Customer service:
-- Environment variable: `CUSTOMER_SERVICE_URL`
-- Request used: `GET {CUSTOMER_SERVICE_URL}{API_VERSION}/customers/{customer_id}`
-- Forwarded headers:
-- `Authorization`
-- `X-Request-ID`
-- Purpose:
-- Validate that the customer exists in the same organization
-- Capture `customer_email` and `customer_name` into the order record
+- Customer service
+  - Environment variable: `CUSTOMER_SERVICE_URL`
+  - Request used: `GET {CUSTOMER_SERVICE_URL}{API_VERSION}/customers/{customer_id}`
+  - Forwarded headers:
+    - `Authorization`
+    - `X-Request-ID`
+  - Purpose:
+    - Validate that the customer exists in the same organization
+    - Capture `customer_email` and `customer_name` into the order record`
 
 ### Outbound asynchronous messaging
 
 - Notification service via RabbitMQ/Celery
-- Queue: `notification_queue`
-- Tasks:
-- `notification.send_order_created_email`
-- `notification.send_order_confirmed_email`
-- `notification.send_order_cancelled_email`
+  - Queue: `notification_queue`
+  - Tasks:
+    - `notification.send_order_created_email`
+    - `notification.send_order_confirmed_email`
+    - `notification.send_order_cancelled_email`
 
 ### Inbound dependencies
 
@@ -141,24 +136,15 @@ Order response:
 
 ## Deployment config and secrets
 
-Secret name:
-
-- `order-secret`
-
-Required secret keys:
-
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `ENVIRONMENT`
-- `RABBITMQ_URL`
-
-ConfigMap name:
-
-- `order-config`
-
-Required ConfigMap keys:
-
-- `CUSTOMER_SERVICE_URL`
+- Secret name: `order-secret`
+- Required secret keys:
+  - `DATABASE_URL`
+  - `JWT_SECRET_KEY`
+  - `ENVIRONMENT`
+  - `RABBITMQ_URL`
+- ConfigMap name: `order-config`
+- Required ConfigMap keys:
+  - `CUSTOMER_SERVICE_URL`
 
 ## Dockerfile
 
@@ -175,14 +161,16 @@ Security approach:
 
 Build stages:
 
-- `builder`: starts from `dhi.io/python:3.13-dev`
-- Creates a virtual environment at `/app/venv`
-- Copies `requirements.txt`
-- Installs Python dependencies into the virtual environment
-- Uses a pip cache mount to speed up repeated builds
-- Final stage starts from `dhi.io/python:3.13.13`
-- Copies the prepared virtual environment from the builder stage
-- Copies the `app/` source directory into the image
+- Builder stage:
+  - Starts from `dhi.io/python:3.13-dev`
+  - Creates a virtual environment at `/app/venv`
+  - Copies `requirements.txt`
+  - Installs Python dependencies into the virtual environment
+  - Uses a pip cache mount to speed up repeated builds
+- Runtime stage:
+  - Starts from `dhi.io/python:3.13.13`
+  - Copies the prepared virtual environment from the builder stage
+  - Copies the `app/` source directory into the image
 
 Runtime configuration:
 
