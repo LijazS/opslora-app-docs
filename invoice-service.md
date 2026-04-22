@@ -163,6 +163,15 @@ Required ConfigMap keys:
 
 The Invoice Service uses a multi-stage Python Docker build.
 
+Security approach:
+
+- The runtime image uses `dhi.io/python:3.13.13`, which is a hardened base image intended for safer production use.
+- Hardened images help reduce unnecessary packages and lower the attack surface of the container.
+- Using a curated runtime base also supports stronger security and compliance practices compared to a generic development-oriented image.
+- The multi-stage build keeps dependency installation in the builder stage and leaves the runtime image smaller and cleaner.
+- The container runs as non-root user `10001`, which limits the impact of a container breakout or application-level compromise.
+- File copies use controlled ownership and permissions so the runtime container has only the access it needs.
+
 Build stages:
 
 - `builder`: starts from `dhi.io/python:3.13-dev`

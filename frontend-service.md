@@ -144,6 +144,15 @@ Required ConfigMap keys:
 
 The Frontend Service uses a multi-stage Node.js Docker build.
 
+Security approach:
+
+- The runtime image uses `dhi.io/node:20-debian13`, which is a hardened base image intended for safer production deployments.
+- Hardened images help reduce unnecessary packages and lower the attack surface of the container.
+- The multi-stage build separates build-time tooling from the final runtime image so only the assets needed to serve the app are shipped.
+- Production dependencies are installed separately with `npm ci --omit=dev`, which avoids carrying development packages into runtime.
+- The container runs as the non-root `node` user, which reduces the blast radius if the application or container is compromised.
+- Controlled ownership during `COPY` helps ensure the runtime user has the required access without granting broader privileges.
+
 Build stages:
 
 - `builder`: starts from `node:20-alpine`
