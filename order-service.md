@@ -118,7 +118,7 @@ Base router:
     - `X-Request-ID`
   - Purpose:
     - Validate that the customer exists in the same organization
-    - Capture `customer_email` and `customer_name` into the order record`
+    - Capture `customer_email` and `customer_name` into the order record
 
 ### Outbound asynchronous messaging
 

@@ -40,24 +40,19 @@ Base router:
 
 ### Request and response models
 
-Payment create payload:
-
-- `invoice_id`
-- `amount`
-- `payment_method`: `CASH`, `CARD`, `UPI`, `BANK_TRANSFER`
-
-Payment response:
-
-- `id`
-- `invoice_id`
-- `amount`
-- `payment_method`
-- `paid_at`
-
-Refund response returned by service logic:
-
-- `invoice_id`
-- `status`
+- Payment create payload:
+  - `invoice_id`
+  - `amount`
+  - `payment_method`: `CASH`, `CARD`, `UPI`, `BANK_TRANSFER`
+- Payment response:
+  - `id`
+  - `invoice_id`
+  - `amount`
+  - `payment_method`
+  - `paid_at`
+- Refund response returned by service logic:
+  - `invoice_id`
+  - `status`
 
 ## Data model
 
@@ -99,14 +94,14 @@ Refund response returned by service logic:
 
 ### Outbound synchronous HTTP
 
-- Invoice service:
-- Environment variable: `INVOICE_SERVICE_URL`
-- Reads:
-- `GET {INVOICE_SERVICE_URL}/api/v1/invoices/{invoice_id}`
-- Writes:
-- `POST {INVOICE_SERVICE_URL}/api/v1/invoices/{invoice_id}/status`
-- Forwarded header:
-- `Authorization`
+- Invoice service
+  - Environment variable: `INVOICE_SERVICE_URL`
+  - Reads:
+    - `GET {INVOICE_SERVICE_URL}/api/v1/invoices/{invoice_id}`
+  - Writes:
+    - `POST {INVOICE_SERVICE_URL}/api/v1/invoices/{invoice_id}/status`
+  - Forwarded header:
+    - `Authorization`
 
 ### Inbound synchronous HTTP
 
@@ -114,23 +109,14 @@ Refund response returned by service logic:
 
 ## Deployment config and secrets
 
-Secret name:
-
-- `payment-secret`
-
-Required secret keys:
-
-- `DATABASE_URL`
-- `JWT_SECRET_KEY`
-- `ENVIRONMENT`
-
-ConfigMap name:
-
-- `payment-config`
-
-Required ConfigMap keys:
-
-- `INVOICE_SERVICE_URL`
+- Secret name: `payment-secret`
+- Required secret keys:
+  - `DATABASE_URL`
+  - `JWT_SECRET_KEY`
+  - `ENVIRONMENT`
+- ConfigMap name: `payment-config`
+- Required ConfigMap keys:
+  - `INVOICE_SERVICE_URL`
 
 ## Dockerfile
 
@@ -147,14 +133,16 @@ Security approach:
 
 Build stages:
 
-- `builder`: starts from `dhi.io/python:3.13-dev`
-- Creates a virtual environment at `/app/venv`
-- Copies `requirements.txt`
-- Installs Python dependencies into the virtual environment
-- Uses a pip cache mount to speed up repeated builds
-- Final stage starts from `dhi.io/python:3.13.13`
-- Copies the prepared virtual environment from the builder stage
-- Copies the `app/` source directory into the image
+- Builder stage:
+  - Starts from `dhi.io/python:3.13-dev`
+  - Creates a virtual environment at `/app/venv`
+  - Copies `requirements.txt`
+  - Installs Python dependencies into the virtual environment
+  - Uses a pip cache mount to speed up repeated builds
+- Runtime stage:
+  - Starts from `dhi.io/python:3.13.13`
+  - Copies the prepared virtual environment from the builder stage
+  - Copies the `app/` source directory into the image
 
 Runtime configuration:
 

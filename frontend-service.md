@@ -89,56 +89,48 @@ The frontend service is a Next.js application that provides the user-facing Opsl
 
 ## Backend APIs used by the frontend
 
-Shared API prefix in code:
-
-- `sales-frontend-ui/lib/api.ts` currently prefixes requests with `/api/v1`
-
-Routes used by the UI:
-
-- Auth:
-- `POST /api/v1/auth/signup`
-- `POST /api/v1/auth/login`
-- Customers:
-- `GET /api/v1/customers`
-- `POST /api/v1/customers/create-customer`
-- `GET /api/v1/customers/{id}`
-- `PUT /api/v1/customers/{id}`
-- Orders:
-- `GET /api/v1/orders`
-- `GET /api/v1/orders/{id}`
-- `POST /api/v1/orders/create-order/`
-- `PUT /api/v1/orders/{id}`
-- `POST /api/v1/orders/{id}/confirm`
-- `POST /api/v1/orders/{id}/cancel`
-- Invoices:
-- `GET /api/v1/invoices`
-- `GET /api/v1/invoices/{id}`
-- `POST /api/v1/invoices/orders/{id}`
-- `POST /api/v1/invoices/{id}/cancel`
-- Payments:
-- `GET /api/v1/payments/invoice/{id}`
-- `POST /api/v1/payments/pay`
-- `POST /api/v1/payments/refund/{id}`
+- Shared API prefix in code:
+  - `sales-frontend-ui/lib/api.ts` currently prefixes requests with `/api/v1`
+- Routes used by the UI:
+  - Auth:
+    - `POST /api/v1/auth/signup`
+    - `POST /api/v1/auth/login`
+  - Customers:
+    - `GET /api/v1/customers`
+    - `POST /api/v1/customers/create-customer`
+    - `GET /api/v1/customers/{id}`
+    - `PUT /api/v1/customers/{id}`
+  - Orders:
+    - `GET /api/v1/orders`
+    - `GET /api/v1/orders/{id}`
+    - `POST /api/v1/orders/create-order/`
+    - `PUT /api/v1/orders/{id}`
+    - `POST /api/v1/orders/{id}/confirm`
+    - `POST /api/v1/orders/{id}/cancel`
+  - Invoices:
+    - `GET /api/v1/invoices`
+    - `GET /api/v1/invoices/{id}`
+    - `POST /api/v1/invoices/orders/{id}`
+    - `POST /api/v1/invoices/{id}/cancel`
+  - Payments:
+    - `GET /api/v1/payments/invoice/{id}`
+    - `POST /api/v1/payments/pay`
+    - `POST /api/v1/payments/refund/{id}`
 
 ## Communication with other services
 
-- Frontend -> Auth service for signup and login
-- Frontend -> Customer service for customer management
-- Frontend -> Order service for order management
-- Frontend -> Invoice service for invoice management
-- Frontend -> Payment service for payment and refund flows
+- Frontend to Auth service for signup and login
+- Frontend to Customer service for customer management
+- Frontend to Order service for order management
+- Frontend to Invoice service for invoice management
+- Frontend to Payment service for payment and refund flows
 
 The frontend does not communicate directly with MySQL or RabbitMQ.
 
 ## Deployment config and secrets
 
-Required secret keys:
-
-- None
-
-Required ConfigMap keys:
-
-- None
+- Required secret keys: None
+- Required ConfigMap keys: None
 
 ## Dockerfile
 
@@ -155,16 +147,19 @@ Security approach:
 
 Build stages:
 
-- `builder`: starts from `node:20-alpine`
-- Copies `package*.json`
-- Runs `npm ci`
-- Copies the full application source
-- Builds the production Next.js output with `npm run build`
-- `deps`: starts from `node:20-alpine`
-- Installs production-only dependencies with `npm ci --omit=dev`
-- Final stage starts from `dhi.io/node:20-debian13`
-- Copies production `node_modules` from the `deps` stage
-- Copies `.next`, `public`, `package.json`, and `next.config.*` from the `builder` stage
+- Builder stage:
+  - Starts from `node:20-alpine`
+  - Copies `package*.json`
+  - Runs `npm ci`
+  - Copies the full application source
+  - Builds the production Next.js output with `npm run build`
+- Dependency stage:
+  - Starts from `node:20-alpine`
+  - Installs production-only dependencies with `npm ci --omit=dev`
+- Runtime stage:
+  - Starts from `dhi.io/node:20-debian13`
+  - Copies production `node_modules` from the `deps` stage
+  - Copies `.next`, `public`, `package.json`, and `next.config.*` from the `builder` stage
 
 Runtime configuration:
 
