@@ -4,7 +4,7 @@ Opslora is a microservices-based sales management application that supports the 
 
 ## Application Diagram
 
-![Application Diagram](./images/application_diagram.jpg)
+![Application Diagram](./images/application_diagram.svg)
 
 The application is built around independent microservices, each responsible for a specific domain within the sales lifecycle. Together, these services power the frontend experience, core business processes, financial operations, and background communication workflows.
 
