@@ -12,19 +12,6 @@ The customer service owns customer master data for each organization. It exposes
 - Update customer details.
 - Confirm whether a customer exists within the caller's organization.
 
-## Location
-
-- Source: `sales-customer-service/`
-- FastAPI entrypoint: `sales-customer-service/app/main.py`
-- Router: `sales-customer-service/app/routers/v1/customers.py`
-- Business logic: `sales-customer-service/app/services/customer_service.py`
-- Model: `sales-customer-service/app/models/customer.py`
-- Docker build: `sales-customer-service/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/customers-deployment.yaml`
-- Kubernetes service: `k8s/Services/customers-service.yaml`
-- Kubernetes route: `k8s/httproutes/customer-route.yaml`
-
 ## Features
 
 - Organization-scoped customer records

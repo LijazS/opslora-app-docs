@@ -14,20 +14,6 @@ The order service manages sales orders and line items for each organization. It 
 - Cancel eligible orders
 - Trigger order lifecycle email notifications
 
-## Location
-
-- Source: `sales-order-service/`
-- FastAPI entrypoint: `sales-order-service/app/main.py`
-- Router: `sales-order-service/app/routers/v1/orders.py`
-- Business logic: `sales-order-service/app/services/order_service.py`
-- Service client: `sales-order-service/app/utils/service_client.py`
-- Models: `sales-order-service/app/models/order.py`, `sales-order-service/app/models/order_item.py`
-- Docker build: `sales-order-service/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/order-deployment.yaml`
-- Kubernetes service: `k8s/Services/order-service.yaml`
-- Kubernetes route: `k8s/httproutes/order-route.yaml`
-
 ## Features
 
 - Order creation with multiple line items

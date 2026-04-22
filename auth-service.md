@@ -12,19 +12,6 @@ The auth service is the identity and authorization entry point for the platform.
 - Seed roles and permission definitions.
 - Publish signup notification events to RabbitMQ.
 
-## Location
-
-- Source: `sales-auth-service/`
-- FastAPI entrypoint: `sales-auth-service/app/main.py`
-- Router: `sales-auth-service/app/routers/v1/auth.py`
-- Business logic: `sales-auth-service/app/services/auth_service.py`
-- Seed data: `sales-auth-service/app/init_db.py`
-- Docker build: `sales-auth-service/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/auth-deployment.yaml`
-- Kubernetes service: `k8s/Services/auth-service.yaml`
-- Kubernetes route: `k8s/httproutes/auth-route.yaml`
-
 ## Responsibilities
 
 - Create `organizations`, `users`, `organization_users`, and `user_roles` records during signup.

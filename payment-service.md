@@ -12,20 +12,6 @@ The payment service records payments against invoices, calculates whether an inv
 - Mark fully paid invoices as refunded
 - Synchronize invoice status with the invoice service
 
-## Location
-
-- Source: `sales-payment-service/`
-- FastAPI entrypoint: `sales-payment-service/app/main.py`
-- Router: `sales-payment-service/app/routers/payments.py`
-- Business logic: `sales-payment-service/app/services/payment_service.py`
-- Service client: `sales-payment-service/app/utils/service_client.py`
-- Model: `sales-payment-service/app/models/payment.py`
-- Docker build: `sales-payment-service/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/payment-deployment.yaml`
-- Kubernetes service: `k8s/Services/payment-service.yaml`
-- Kubernetes route: `k8s/httproutes/payment-route.yaml`
-
 ## Features
 
 - Payment creation with multiple payment methods

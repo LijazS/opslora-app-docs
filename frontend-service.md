@@ -12,19 +12,6 @@ The frontend service is a Next.js application that provides the user-facing Opsl
 - Gate dashboard pages behind authentication
 - Orchestrate cross-service user journeys such as order-to-invoice and invoice-to-payment
 
-## Location
-
-- Source: `sales-frontend-ui/`
-- Package manifest: `sales-frontend-ui/package.json`
-- API client: `sales-frontend-ui/lib/api.ts`
-- Auth provider: `sales-frontend-ui/lib/auth-context.tsx`
-- App shell: `sales-frontend-ui/app/(dashboard)/layout.tsx`
-- Docker build: `sales-frontend-ui/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/frontend-deployment.yaml`
-- Kubernetes service: `k8s/Services/frontend-service.yaml`
-- Kubernetes route: `k8s/httproutes/frontend-route.yaml`
-
 ## Stack
 
 - Next.js `16.1.3`

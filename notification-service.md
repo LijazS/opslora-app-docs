@@ -11,18 +11,6 @@ The notification service is the platform's asynchronous email worker. It consume
 - Retry failed email tasks automatically
 - Expose a minimal health endpoint
 
-## Location
-
-- Source: `sales-notification-service/`
-- FastAPI entrypoint: `sales-notification-service/app/main.py`
-- Celery app: `sales-notification-service/app/core/celery_app.py`
-- Worker bootstrap: `sales-notification-service/entrypoint.sh`
-- Email tasks: `sales-notification-service/app/tasks/email_tasks.py`, `sales-notification-service/app/tasks/order_email_tasks.py`
-- SMTP service helper: `sales-notification-service/app/services/email_service.py`
-- Docker build: `sales-notification-service/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/notification-deployment.yaml`
-
 ## Features
 
 - RabbitMQ-backed task consumption

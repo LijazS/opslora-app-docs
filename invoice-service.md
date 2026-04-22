@@ -13,20 +13,6 @@ The invoice service creates one invoice per confirmed order, computes tax and di
 - Cancel unpaid invoices
 - Accept status changes from payment workflows
 
-## Location
-
-- Source: `sales-invoice-service/`
-- FastAPI entrypoint: `sales-invoice-service/app/main.py`
-- Router: `sales-invoice-service/app/routers/invoices.py`
-- Business logic: `sales-invoice-service/app/services/invoice_service.py`
-- Service client: `sales-invoice-service/app/utils/service_client.py`
-- Model: `sales-invoice-service/app/models/invoice.py`
-- Docker build: `sales-invoice-service/Dockerfile`
-- Local compose service: `docker-compose.yaml`
-- Kubernetes deployment: `k8s/Deployments/invoice-deployment.yaml`
-- Kubernetes service: `k8s/Services/invoice-service.yaml`
-- Kubernetes route: `k8s/httproutes/invoice-route.yaml`
-
 ## Features
 
 - Invoice creation from orders
